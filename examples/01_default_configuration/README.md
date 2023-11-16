@@ -18,7 +18,7 @@ No providers.
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_msk_monitor"></a> [msk\_monitor](#module\_msk\_monitor) | ../.. | n/a |
+| <a name="module_rds_monitor"></a> [rds\_monitor](#module\_rds\_monitor) | ../.. | n/a |
 
 ## Resources
 
@@ -32,5 +32,5 @@ No inputs.
 
 | Name | Description |
 |------|-------------|
-| <a name="output_cloudwatch_alert_arns"></a> [cloudwatch\_alert\_arns](#output\_cloudwatch\_alert\_arns) | A map consisting of MSK cluster names and their CloudWatch metric alarm ARNs. |
+| <a name="output_cloudwatch_alert_arns"></a> [cloudwatch\_alert\_arns](#output\_cloudwatch\_alert\_arns) | A map consisting of RDS names and their CloudWatch metric alarm ARNs. |
 <!-- END_TF_DOCS -->
