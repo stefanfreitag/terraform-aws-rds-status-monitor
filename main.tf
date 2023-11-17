@@ -141,7 +141,7 @@ resource "aws_cloudwatch_metric_alarm" "this" {
   insufficient_data_actions = []
   ok_actions                = []
   dimensions = {
-#    ClusterName = each.key
+    DBInstanceIdentifier = each.key
   }
   tags = var.tags
 }
