@@ -26,6 +26,8 @@ terraform.rc
 
 # Python virtual environment
 .venv
+# Python bytecode
+__pycache__/
 
 # JetBrains IDEs
 .idea
