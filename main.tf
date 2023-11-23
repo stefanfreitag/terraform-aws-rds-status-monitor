@@ -86,7 +86,7 @@ resource "aws_lambda_function" "rds_health_lambda" {
   }
   environment {
     variables = {
-      RDS_ARNS              = join(",", var.rds_arns)
+      RDS_ARNS                  = join(",", var.rds_arns)
       ENABLE_CLOUDWATCH_METRICS = var.enable_cloudwatch_alarms
       SUPPRESS_STATES           = join(",", var.ignore_states)
     }
