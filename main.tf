@@ -99,7 +99,7 @@ resource "aws_cloudwatch_event_rule" "rds_health_lambda_schedule" {
   name                = "rds-health-eventbridge-rule-${random_id.id.hex}"
   description         = "Scheduled execution of the RDS monitor"
   schedule_expression = var.schedule_expression
-  is_enabled          = true
+  state               = "ENABLED"
   tags                = var.tags
 }
 
@@ -147,5 +147,5 @@ resource "aws_cloudwatch_metric_alarm" "this" {
 }
 
 locals {
-  rds_names = var.enable_cloudwatch_alarms ? sort([for arn in var.rds_arns : element(split("/", arn), 1)]) : []
+  rds_names = var.enable_cloudwatch_alarms ? sort([for arn in var.rds_arns : element(split(":", arn), 6)]) : []
 }
