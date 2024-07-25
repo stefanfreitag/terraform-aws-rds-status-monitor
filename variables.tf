@@ -4,6 +4,23 @@ variable "rds_arns" {
   default     = []
 }
 
+variable "alarm_actions" {
+  description = "The list of actions to execute when this alarm transitions into an ALARM state from any other state. Each action is specified as an Amazon Resource Name (ARN). Default is `null`."
+  type        = list(string)
+  default     = null
+}
+
+variable "insufficient_data_actions" {
+  description = "The list of actions to execute when this alarm transitions into an INSUFFICIENT_DATA state from any other state. Each action is specified as an Amazon Resource Name (ARN). Default is `null`."
+  type        = list(string)
+  default     = null
+}
+
+variable "ok_actions" {
+  description = "The list of actions to execute when this alarm transitions into an OK state from any other state. Each action is specified as an Amazon Resource Name (ARN)."
+  type        = list(string)
+  default     = null
+}
 
 variable "enable_cloudwatch_alarms" {
   description = "Setup CloudWatch alarms for the RDS state. For each state a separate alarm will be created. Default is `false`."
