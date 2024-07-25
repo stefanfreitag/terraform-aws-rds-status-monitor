@@ -124,7 +124,6 @@ resource "aws_cloudwatch_log_group" "rds_health_lambda_log_groups" {
   tags              = var.tags
 }
 
-
 resource "aws_cloudwatch_metric_alarm" "this" {
   for_each                  = toset(local.rds_names)
   namespace                 = "Custom/RDS"
@@ -137,9 +136,9 @@ resource "aws_cloudwatch_metric_alarm" "this" {
   statistic                 = "Average"
   threshold                 = 0
   treat_missing_data        = var.cloudwatch_alarms_treat_missing_data
-  alarm_actions             = []
-  insufficient_data_actions = []
-  ok_actions                = []
+  alarm_actions             = var.alarm_actions
+  insufficient_data_actions = var.insufficient_data_actions
+  ok_actions                = var.ok_actions
   dimensions = {
     DBInstanceIdentifier = each.key
   }
