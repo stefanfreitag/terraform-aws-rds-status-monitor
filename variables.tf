@@ -47,6 +47,13 @@ variable "ignore_states" {
   ]
 }
 
+variable "lambda_insights_layers_arn" {
+  description = "The ARN of the Lambda Insights layer. Default is `null`."
+  type        = string
+  default     = null
+}
+
+
 variable "log_retion_period_in_days" {
   type        = number
   default     = 365
@@ -57,6 +64,12 @@ variable "log_retion_period_in_days" {
     400, 545, 731, 1096, 1827, 2192, 2557, 2992, 3288, 3653], var.log_retion_period_in_days)
     error_message = "log_retion_period_in_days must be one of the allowed values: 1, 3, 5, 7, 14, 30, 60, 90, 120, 150, 180, 365, 400, 545, 731, 1096, 1827, 2192, 2557, 2922, 3288, 3653"
   }
+}
+
+variable "name" {
+  type        = string
+  description = "Name of the health monitor. Default is `rds_status_monitor`."
+  default     = "rds_status_monitor"
 }
 
 variable "memory_size" {
@@ -79,5 +92,15 @@ variable "tags" {
   description = "A map of tags to add to all resources. Default is `{}`."
   type        = map(string)
   default = {
+  }
+}
+
+variable "timeout" {
+  type        = number
+  description = "The amount of time that Lambda allows a function to run before stopping it. Default is 30 seconds."
+  default     = 30
+  validation {
+    condition     = var.timeout >= 10 && var.timeout <= 900
+    error_message = "Timeout must be between 10 and 900."
   }
 }
