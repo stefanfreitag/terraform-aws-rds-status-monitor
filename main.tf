@@ -1,11 +1,6 @@
-# A random identifier used for naming resources
-resource "random_id" "id" {
-  byte_length = 8
-}
-
 # IAM role
-resource "aws_iam_role" "rds_health_lambda_role" {
-  name               = "rds-health-lambda-role-${random_id.id.hex}"
+resource "aws_iam_role" "this" {
+  name               = var.name
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -25,18 +20,18 @@ EOF
 }
 
 # IAM role attachment
-resource "aws_iam_role_policy_attachment" "rds_health_permissions" {
-  role       = aws_iam_role.rds_health_lambda_role.name
-  policy_arn = aws_iam_policy.rds_health_lambda_role_policy.arn
+resource "aws_iam_role_policy_attachment" "this" {
+  role       = aws_iam_role.this.name
+  policy_arn = aws_iam_policy.this.arn
 
-  depends_on = [aws_iam_policy.rds_health_lambda_role_policy,
-  aws_iam_role.rds_health_lambda_role]
+  depends_on = [aws_iam_policy.this,
+  aws_iam_role.this]
 }
 
-resource "aws_iam_policy" "rds_health_lambda_role_policy" {
-  name        = "rds-health-lambda-role-policy-${random_id.id.hex}"
+resource "aws_iam_policy" "this" {
+  name        = var.name
   path        = "/"
-  description = "IAM policy rds health solution lambda"
+  description = var.name
   policy      = <<EOF
 {
     "Version": "2012-10-17",
@@ -69,17 +64,18 @@ EOF
   tags        = var.tags
 }
 
-resource "aws_lambda_function" "rds_health_lambda" {
+resource "aws_lambda_function" "this" {
   filename                       = data.archive_file.status_checker_code.output_path
-  function_name                  = "rds_status_monitor-${random_id.id.hex}"
-  description                    = "RDS Status Monitor"
-  role                           = aws_iam_role.rds_health_lambda_role.arn
+  function_name                  = var.name
+  description                    = var.name
+  role                           = aws_iam_role.this.arn
   handler                        = "index.lambda_handler"
-  runtime                        = "python3.11"
-  reserved_concurrent_executions = 1
+  runtime                        = "python3.12"
+  layers                         = var.lambda_insights_layers_arn == null ? [] : [var.lambda_insights_layers_arn]
+  reserved_concurrent_executions = 2
   memory_size                    = var.memory_size
   source_code_hash               = data.archive_file.status_checker_code.output_base64sha256
-  timeout                        = 60
+  timeout                        = var.timeout
   tags                           = var.tags
   tracing_config {
     mode = "Active"
@@ -91,35 +87,34 @@ resource "aws_lambda_function" "rds_health_lambda" {
       SUPPRESS_STATES           = join(",", var.ignore_states)
     }
   }
-
 }
 
 # eventbridge rule
-resource "aws_cloudwatch_event_rule" "rds_health_lambda_schedule" {
-  name                = "rds-health-eventbridge-rule-${random_id.id.hex}"
+resource "aws_cloudwatch_event_rule" "this" {
+  name                = var.name
   description         = "Scheduled execution of the RDS monitor"
   schedule_expression = var.schedule_expression
   state               = "ENABLED"
   tags                = var.tags
 }
 
-resource "aws_cloudwatch_event_target" "rds_health_lambda_target" {
-  arn  = aws_lambda_function.rds_health_lambda.arn
-  rule = aws_cloudwatch_event_rule.rds_health_lambda_schedule.name
+resource "aws_cloudwatch_event_target" "this" {
+  arn  = aws_lambda_function.this.arn
+  rule = aws_cloudwatch_event_rule.this.name
 }
 
 resource "aws_lambda_permission" "allow_cw_call_lambda" {
   statement_id  = "AllowExecutionFromCloudWatch"
   action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.rds_health_lambda.function_name
+  function_name = aws_lambda_function.this.function_name
   principal     = "events.amazonaws.com"
-  source_arn    = aws_cloudwatch_event_rule.rds_health_lambda_schedule.arn
+  source_arn    = aws_cloudwatch_event_rule.this.arn
 }
 
 
 # Log group for the Lambda function
 resource "aws_cloudwatch_log_group" "rds_health_lambda_log_groups" {
-  name              = "/aws/lambda/rds_status_monitor-${random_id.id.hex}"
+  name              = "/aws/lambda/${var.name}"
   retention_in_days = var.log_retion_period_in_days
   tags              = var.tags
 }
@@ -129,7 +124,7 @@ resource "aws_cloudwatch_metric_alarm" "this" {
   namespace                 = "Custom/RDS"
   period                    = 300
   metric_name               = "Status"
-  alarm_name                = "rds-status-monitor-${each.key}-${random_id.id.hex}"
+  alarm_name                = "${var.name}-${each.key}"
   comparison_operator       = "GreaterThanThreshold"
   alarm_description         = "This alarm triggers on RDS status."
   evaluation_periods        = 2

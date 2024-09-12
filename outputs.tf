@@ -1,6 +1,6 @@
 output "role_arn" {
   description = "The ARN of the IAM role."
-  value       = aws_iam_role.rds_health_lambda_role.arn
+  value       = aws_iam_role.this.arn
 }
 
 output "cloudwatch_metric_alarm_arns" {
