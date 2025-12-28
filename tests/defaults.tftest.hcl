@@ -24,8 +24,8 @@ run "eventbridge_default_is_enabled" {
 run "aws_cloudwatch_metric_alarm_default_treat_missing_data" {
   command = plan
   variables {
-    rds_arns                         = ["arn:aws:rds:eu-central-1:012345678901:db:my-rds-instance"]
-    enable_cloudwatch_alarms             = true
+    rds_arns                 = ["arn:aws:rds:eu-central-1:012345678901:db:my-rds-instance"]
+    enable_cloudwatch_alarms = true
   }
 
   assert {
